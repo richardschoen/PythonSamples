@@ -19,7 +19,47 @@
 #
 # Incoming Parameters
 # None
-# ------------------------------------------------
+# -------------------------------------------------------------------------
+#
+# CL Sample program
+#
+#/****************************************************/            
+#/* Program: PYPGM001C                               */            
+#/* Desc . : Test Program to Return Parameters       */            
+#/*          We set a return message and also        */            
+#/*          increment and return the balance.       */            
+#/*          This sample obviously does no database  */            
+#/*          updating but illustrates passing parms. */            
+#/****************************************************/            
+#             PGM        PARM(&RTNMSG &AMOUNT)                     
+#                                                                  
+#             DCL        VAR(&RTNMSG) TYPE(*CHAR) LEN(50)          
+#             DCL        VAR(&AMOUNT) TYPE(*DEC) LEN(15 2)         
+#             DCL        VAR(&INCREMENT) TYPE(*DEC) LEN(15 2) +    
+#                          VALUE(1000000.00)                       
+#                                                                  
+#/* Program level monitor to handle any unhandled errors */        
+#/* We don't want out app throwing QSYSOPR messages.     */          
+#             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(ERRORS))    
+#                                                                    
+#/* Increment balance based on passed in amount */                   
+#             CHGVAR     VAR(&AMOUNT) VALUE(&INCREMENT + &AMOUNT)    
+#                                                                    
+#/* Set return message and return */                                 
+#             CHGVAR     VAR(&RTNMSG) VALUE(&AMOUNT)                 
+#             CHGVAR     VAR(&RTNMSG) VALUE('Thank you for your +    
+#                          business')                                
+#                                                                    
+#             RETURN                                                 
+#                                                                    
+#/* Set error return message and return */                           
+#ERRORS:                                                             
+#             CHGVAR     VAR(&RTNMSG) VALUE('ERROR: Errors occurred +
+#                          during processing')                       
+#             CHGVAR     VAR(&AMOUNT) VALUE(-99999.00)     
+#                                                          
+#             ENDPGM                                       						  
+# -------------------------------------------------------------------------
 
 # ------------------------------------------------
 # Imports
