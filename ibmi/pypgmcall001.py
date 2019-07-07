@@ -6,6 +6,7 @@
 # This script will connect to a local IBM i system
 # via XMLSERVICE and set the library and call a program
 # named PYPGM001C in library PYSAMPLES.
+# The program uses iToolkit for connectivity.
 # The program call will receive 2 return parameter
 # values which can then be used as needed.
 # In our example we just output them.
