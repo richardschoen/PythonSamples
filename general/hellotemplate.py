@@ -1,4 +1,4 @@
-#!/QOpenSys/pkgs/bin/python3
+#!/usr/bin/python
 #------------------------------------------------
 # Script name: hellotemplate.py
 #
