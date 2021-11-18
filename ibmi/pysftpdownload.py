@@ -44,13 +44,14 @@ import pysftp
 #------------------------------------------------
 
 # Initialize or set variables
+appname="Downloading File via SFTP"
 exitcode=0 #Init exitcode
 exitmessage='' #Init the exit message
 parmsexpected=7; #How many parms do we need ?
 
 #Output messages to STDOUT for logging
 print("-------------------------------------------------------------------------------")
-print("Downloading File via SFTP")
+print(appname)
 print("Start of Main Processing - " + time.strftime("%H:%M:%S"))
 print("OS:" + platform)
 
@@ -108,7 +109,7 @@ try: # Try to perform main logic
 
    # Set success info
    exitcode=0
-   exitmessage="SFTP transfer was successful."
+   exitmessage=appname + " was successful."
 
 #------------------------------------------------
 # Handle Exceptions
