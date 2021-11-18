@@ -1,4 +1,7 @@
+## IBMi 
 #!/QOpenSys/pkgs/bin/python3
+## Other platform
+#!/usr/bin/python
 #------------------------------------------------
 # Script name: pyscripttemplate1.py
 #
