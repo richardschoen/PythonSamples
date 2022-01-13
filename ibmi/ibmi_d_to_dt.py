@@ -21,8 +21,8 @@ def ibm_i_date_to_datetime(ibmidate: str) -> datetime.datetime:
 
     Returns
     -------
-    _dd : TYPE
-        Python datetime
+    _dd : datetime.datetime
+        Python datetime for the converted string
 
     """
     _cn = 2000 if int(ibmidate[0:1]) == 1 else 1900
