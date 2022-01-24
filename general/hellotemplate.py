@@ -4,8 +4,8 @@
 #
 # Description: 
 # This script is a generic command line Python app template.
-# The example shows an example of how to nicely handle parameter 
-# requirements and parsing parameters. 
+# The example shows how to nicely handle parameter requirements 
+# and parsing parameters. 
 #
 # Pip packages needed:
 # arparse built-in.
@@ -120,7 +120,8 @@ try: # Try to perform main logic
    print("Parm 2: " + str(parm2))
    print("Parm 3: " + str(parm3))
 
-   print("Hello World")
+   # Do some work now 
+   print("Hello World.")
    
    # Set success info
    exitcode=0
@@ -129,22 +130,39 @@ try: # Try to perform main logic
 #------------------------------------------------
 # Handle Exceptions
 #------------------------------------------------
+# System Exit occurred. Most likely from argument parser
+except SystemExit as ex:
+     print("Command line argument error.")
+     exitcode=ex.code # set return code for stdout
+     exitmessage=str(ex) # set exit message for stdout
+     #print('Traceback Info') # output traceback info for stdout
+     #traceback.print_exc()
+     sys.exit(99)           
+
+except argparse.ArgumentError as exc:
+     exitcode=99 # set return code for stdout
+     exitmessage=str(exc) # set exit message for stdout
+     #print('Traceback Info') # output traceback info for stdout
+     #traceback.print_exc()      
+     sys.exit(99)
+
 except Exception as ex: # Catch and handle exceptions
-   exitcode=99 # set return code for stdout
-   exitmessage=str(ex) # set exit message for stdout
-   print('Traceback Info') # output traceback info for stdout
-   traceback.print_exc()        
+     exitcode=99 # set return code for stdout
+     exitmessage=str(ex) # set exit message for stdout
+     print('Traceback Info') # output traceback info for stdout
+     traceback.print_exc()        
+     sys.exit(99)
 
 #------------------------------------------------
-# Always perform final processing. Output exit message and exit code
+# Always perform final processing
 #------------------------------------------------
 finally: # Final processing
-    # Do any final code and exit now
-    # We log as much relevent info to STDOUT as needed
-    print('ExitCode:' + str(exitcode))
-    print('ExitMessage:' + exitmessage)
-    print("End of Main Processing - " + time.strftime("%H:%M:%S"))
-    print("-------------------------------------------------------------------------------")
+     # Do any final code and exit now
+     # We log as much relevent info to STDOUT as needed
+     print('ExitCode:' + str(exitcode))
+     print('ExitMessage:' + exitmessage)
+     print("End of Main Processing - " + time.strftime("%H:%M:%S"))
+     print("-------------------------------------------------------------------------------")
     
-    # Exit the script now
-    sys.exit(exitcode) 
+     # Exit the script now
+     sys.exit(exitcode) 
