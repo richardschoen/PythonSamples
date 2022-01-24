@@ -3,18 +3,24 @@
 # Script name: hellotemplate.py
 #
 # Description: 
-# This script is a generic command line Python app template
+# This script is a generic command line Python app template.
+# The example shows an example of how to nicely handle parameter 
+# requirements and parsing parameters. 
 #
 # Pip packages needed:
-# pip3 install xxxxx
+# arparse built-in.
 #
 # Parameters
-# P1=Parm 1
-# P2=Parm 2
+# --parm1=Parm 1
+# --parm2=Parm 2
+# --parm3=Parm 3
 #------------------------------------------------
 # Useful Python links (any links that are educational for this script)
-# https://stackoverflow.com/questions/53864260/no-hostkey-for-host-found-when-connecting-to-sftp-server-with-pysftp-usi
-# https://pysftp.readthedocs.io/en/release_0.2.8/pysftp.html
+# http://zetcode.com/python/argparse/
+# https://stackoverflow.com/questions/5943249/python-argparse-and-controlling-overriding-the-exit-status-code
+# https://www.techbeamers.com/use-try-except-python/
+# argument parse exceptions
+# https://stackoverflow.com/questions/8107713/using-argparse-argumenterror-in-python
 #------------------------------------------------
 # Imports
 #------------------------------------------------
