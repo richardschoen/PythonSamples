@@ -18,17 +18,13 @@
 #------------------------------------------------
 # Imports
 #------------------------------------------------
+import argparse
 import sys
 from sys import platform
 import os
+import re
 import time
-import traceback
-import ibm_db_dbi as db2 
-import xlrd
-import csv
-import datetime as dt
-from string import Template 
-from urllib.parse import unquote
+import traceback 
 
 #------------------------------------------------
 # Script initialization
@@ -39,6 +35,43 @@ appdesc="This is the app desc"
 exitcode=0 #Init exitcode
 exitmessage='' #Init the exit message
 parmsexpected=3; #How many parms do we need ?
+
+ 
+def str2bool(strval):
+    #-------------------------------------------------------
+    # Function: str2bool
+    # Desc: Constructor
+    # :strval: String value for true or false
+    # :return: Return True if string value is" yes, true, t or 1
+    #-------------------------------------------------------
+    return strval.lower() in ("yes", "true", "t", "1")
+
+def trim(strval):
+    #-------------------------------------------------------
+    # Function: trim
+    # Desc: Alternate name for strip
+    # :strval: String value to trim. 
+    # :return: Trimmed value
+    #-------------------------------------------------------
+    return strval.strip()
+
+def rtrim(strval):
+    #-------------------------------------------------------
+    # Function: rtrim
+    # Desc: Alternate name for rstrip
+    # :strval: String value to trim. 
+    # :return: Trimmed value
+    #-------------------------------------------------------
+    return strval.rstrip()
+
+def ltrim(strval):
+    #-------------------------------------------------------
+    # Function: ltrim
+    # Desc: Alternate name for lstrip
+    # :strval: String value to ltrim. 
+    # :return: Trimmed value
+    #-------------------------------------------------------
+    return strval.lstrip()
 
 #Output messages to STDOUT for logging
 print("-------------------------------------------------------------------------------")
@@ -52,15 +85,29 @@ print("OS:" + platform)
 try: # Try to perform main logic
    
    # Check to see if all required parms were passed
-   if len(sys.argv) < parmsexpected + 1:
-        raise Exception(str(parmsexpected) + ' required parms - [Parm 1] [Parm 2] [Parm 3]. Process cancelled.')
+   # Note: Old way to check if all parms passed
+   #if len(sys.argv) < parmsexpected + 1:
+   #     raise Exception(str(parmsexpected) + ' required parms - [Parm 1] [Parm 2] [Parm 3]. Process cancelled.')
+   
+   # Set up the command line argument parsing
+   # If the parse_args function fails, the program will
+   # exit with an error 2. In Python 3.9, there is 
+   # an argument to prevent an auto-exit
+   parser = argparse.ArgumentParser()
+   parser.add_argument('-o', '--output', action='store_true', 
+          help="shows output")
+   parser.add_argument('--parm1', required=True)
+   parser.add_argument('--parm2', required=True)
+   parser.add_argument('--parm3', required=True)
+   # Parsse the command line arguments 
+   args = parser.parse_args()
    
    # Set parameter work variables from command line args
    parmscriptname = sys.argv[0]    #Script name
-   parm1 = sys.argv[1]             #Parameter 1
-   parm2 = int(sys.argv[2])        #Parameter 2 - integer
-   parm3 = eval(sys.argv[3])       #Parameter 3 - boolean
-
+   parm1 = args.parm1              #Parameter 1
+   parm2 = args.parm2              #Parameter 2
+   parm3 = str2bool(args.parm3)    #Parameter 3 - boolean
+   
    # Output parameter variables to log file
    print("Parameters:")
    print("Parm 1: " + parm1)
