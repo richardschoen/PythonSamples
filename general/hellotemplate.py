@@ -10,6 +10,9 @@
 # Pip packages needed:
 # arparse built-in.
 #
+# IBM i header if used there
+# !/QOpenSys/pkgs/bin/python3
+#
 # Parameters
 # --parm1=Parm 1
 # --parm2=Parm 2
@@ -102,10 +105,10 @@ try: # Try to perform main logic
    parser = argparse.ArgumentParser()
    parser.add_argument('-o', '--output', action='store_true', 
           help="shows output")
-   parser.add_argument('--parm1', required=True)
-   parser.add_argument('--parm2', required=True)
-   parser.add_argument('--parm3', required=True)
-   # Parsse the command line arguments 
+   parser.add_argument('--parm1', required=True,help="This is parm 1")
+   parser.add_argument('--parm2', required=True,help="This is parm 2")
+   parser.add_argument('--parm3', default="True",required=False,help="This is optional parm 3. Default value=True")
+   # Parse the command line arguments 
    args = parser.parse_args()
    
    # Set parameter work variables from command line args
