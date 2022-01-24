@@ -17,6 +17,7 @@
 # --parm1=Parm 1
 # --parm2=Parm 2
 # --parm3=Parm 3
+# --help or -h lists all parms on command line.
 #------------------------------------------------
 # Useful Python links (any links that are educational for this script)
 # http://zetcode.com/python/argparse/
