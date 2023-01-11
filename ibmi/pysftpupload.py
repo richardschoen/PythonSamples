@@ -93,7 +93,8 @@ try: # Try to perform main logic
       ###with sftp.cd('/tmp'):           #Ex: temporarily chdir to selected dir if needed
 
       # Make sure local file exists
-      if sftp.isfile(parmfromlocalfile)==False:
+      # Old 1/13/2022 - if sftp.isfile(parmfromlocalfile)==False:
+      if os.path.isfile(parmfromlocalfile)==False:
          raise Exception("Local file " + parmfromlocalfile + " doesn't exist. Process cancelled.")
   
       # Make sure remote output file does not exist
