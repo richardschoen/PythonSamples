@@ -4,21 +4,22 @@
 #
 # Description: 
 # This script will download a specified file from a remote sftp server.
-#
-# TODO Items:  
-# This version utilizes user ID and password, not a private key.
+# This version utilizes user ID and password or a user and private key file.
 #
 # Pip packages needed:
 # pip3 install pysftp
+# pip3 install pysftp-extension
 #
 # Parameters
-# P1=SFTP Host
-# P2=SFTP Port
-# p3=SFTP User
-# p4=SFTP Password
-# P5=From remote file
-# p6=To local file
-# p7=Replace local file it it exists. (True/False)
+# --sftphost/-host=SFTP Host
+# --sftpport/-port=SFTP Port
+# --sftpuser/-user=SFTP User (User name is always required)
+# --sftppass/-pass=SFTP Pass (Pasword can be empty if using private key)
+# --privatekeyfile/-privatekey=SFTP SSH private key file
+# --privatekeypass/-privatepass=SFTP SSH private key password if there is one
+# --fromremotefile/-fromfile=Remote file to download
+# --tolocalfile/-tofile=Local file to download to
+# --replacefile/-replace=Remote local to file if it exists. True/False Default=False
 #------------------------------------------------
 # Useful Python links
 # https://stackoverflow.com/questions/53864260/no-hostkey-for-host-found-when-connecting-to-sftp-server-with-pysftp-usi
@@ -31,13 +32,11 @@ from sys import platform
 import os
 import time
 import traceback
-import ibm_db_dbi as db2 
-import xlrd
-import csv
 import datetime as dt
 from string import Template 
 from urllib.parse import unquote
 import pysftp
+import argparse
 
 #------------------------------------------------
 # Script initialization
@@ -47,7 +46,6 @@ import pysftp
 appname="Downloading File via SFTP"
 exitcode=0 #Init exitcode
 exitmessage='' #Init the exit message
-parmsexpected=7; #How many parms do we need ?
 
 #Output messages to STDOUT for logging
 print("-------------------------------------------------------------------------------")
@@ -56,23 +54,82 @@ print("Start of Main Processing - " + time.strftime("%H:%M:%S"))
 print("OS:" + platform)
 
 #------------------------------------------------
+# Define some useful functions
+#------------------------------------------------
+
+def str2bool(strval):
+    #-------------------------------------------------------
+    # Function: str2bool
+    # Desc: Constructor
+    # :strval: String value for true or false
+    # :return: Return True if string value is" yes, true, t or 1
+    #-------------------------------------------------------
+    return strval.lower() in ("yes", "true", "t", "1")
+
+def trim(strval):
+    #-------------------------------------------------------
+    # Function: trim
+    # Desc: Alternate name for strip
+    # :strval: String value to trim. 
+    # :return: Trimmed value
+    #-------------------------------------------------------
+    return strval.strip()
+
+def rtrim(strval):
+    #-------------------------------------------------------
+    # Function: rtrim
+    # Desc: Alternate name for rstrip
+    # :strval: String value to trim. 
+    # :return: Trimmed value
+    #-------------------------------------------------------
+    return strval.rstrip()
+
+def ltrim(strval):
+    #-------------------------------------------------------
+    # Function: ltrim
+    # Desc: Alternate name for lstrip
+    # :strval: String value to ltrim. 
+    # :return: Trimmed value
+    #-------------------------------------------------------
+    return strval.lstrip()
+
+#------------------------------------------------
 # Main script logic
 #------------------------------------------------
 try: # Try to perform main logic
-   
-   # Check to see if all required parms were passed
-   if len(sys.argv) < parmsexpected + 1:
-        raise Exception(str(parmsexpected) + ' required parms - [SFTP Host] [SFTP Port] [SFTP User] [SFTP Pass] [Remote File to Download] [Local Destination File] [Replace-True/False]. Process cancelled.')
-   
+
    # Set parameter work variables from command line args
    parmscriptname = sys.argv[0]    #Script name
-   parmsftphost = sys.argv[1]      #SFTP host name/ip
-   parmsftpport = int(sys.argv[2]) #Convert port to integer
-   parmsftpuser= sys.argv[3]       #SFTP User  
-   parmsftppass= sys.argv[4]       #SFTP Password
-   parmsftpfromfile= sys.argv[5]   #From remote Ftp file
-   parmtolocalfile= sys.argv[6]    #To local file
-   parmreplace= eval(sys.argv[7])  #Replace local file if it exists-(True/False)
+
+   # Set up the command line argument parsing.
+   # If the parse_args function fails, the program will
+   # exit with an error 2. In Python 3.9, there is 
+   # an argument to prevent an auto-exit
+   # Each argument has a long and short version
+   parser = argparse.ArgumentParser()
+   parser.add_argument('-host','--sftphost', required=True,help="SFTP server host/ip")
+   parser.add_argument('-port','--sftpport', required=True,help="SFTP port")
+   parser.add_argument('-user','--sftpuser', required=True,help="SFTP user")
+   parser.add_argument('-pass','--sftppass', required=True,help="SFTP password")
+   parser.add_argument('-privatekey','--privatekeyfile', required=True,help="Private key file")
+   parser.add_argument('-privatepass','--privatekeypass', required=True,help="Private key password")
+   parser.add_argument('-fromfile','--fromremotefile', required=True,help="Remote file to download")
+   parser.add_argument('-tofile','--tolocalfile', required=True,help="Local file to download to")
+   parser.add_argument('-replace','--replacefile', default="False",required=False,help="Replace output file. Default value=False")
+   
+   # Parse the command line arguments 
+   args = parser.parse_args()
+
+   # Pull arguments into variables so they are meaningful
+   parmsftphost=args.sftphost.strip()
+   parmsftpport=int(args.sftpport.strip())
+   parmsftpuser=args.sftpuser.strip()
+   parmsftppass=args.sftppass.strip()
+   parmsprivatekeyfile=args.privatekeyfile.strip()
+   parmsprivatekeypass=args.privatekeypass.strip()
+   parmsftpfromfile=args.fromremotefile.strip()
+   parmtolocalfile=args.tolocalfile.strip()
+   parmreplace=str2bool(args.replacefile) 
 
    # Output parameter variables to log file
    print("Parameters:")
@@ -87,25 +144,26 @@ try: # Try to perform main logic
    cnopts = pysftp.CnOpts()
    cnopts.hostkeys = None
 
-   # Connect via User and Password   
-   with pysftp.Connection(parmsftphost, port=parmsftpport, username=parmsftpuser, password=parmsftppass,private_key=None,private_key_pass=None,cnopts=cnopts) as sftp:
-
-      ###with sftp.cd('/tmp'):           #Ex: temporarily chdir to selected dir if needed
+   # Connect via User and password or User and Private Key if key file specified  
+   # https://pypi.org/project/pysftp-extension/
+   if (parmsprivatekeyfile!=""): 
+      sftp=pysftp.Connection(parmsftphost, port=parmsftpport, username=parmsftpuser, private_key=parmsprivatekeyfile, private_key_pass=parmsprivatekeypass, cnopts=cnopts)
+   else:
+      sftp=pysftp.Connection(parmsftphost, port=parmsftpport, username=parmsftpuser, password=parmsftppass,private_key=None,private_key_pass=None,cnopts=cnopts)
   
-      # Make sure remote file exists
-      if sftp.isfile(parmsftpfromfile)==False:
-         raise Exception("Remote file " + parmsftpfromfile + " doesn't exist. Process cancelled.")
+   # Make sure remote file exists
+   if sftp.isfile(parmsftpfromfile)==False:
+      raise Exception("Remote file " + parmsftpfromfile + " doesn't exist. Process cancelled.")
 
-      # Make sure local output file does not exist
-      if os.path.isfile(parmtolocalfile):
-         if parmreplace: # If replace, delete existing file
-            os.remove(parmtolocalfile)
-         else: # Bail out if found and replace not selected
-            raise Exception('Local file ' + parmtolocalfile + ' exists and replace not selected. Process cancelled.')          
-        
-      print("Downloading file " + parmsftpfromfile + " to " + parmtolocalfile)
-      # sftp.put('/pycode/filename')  	# upload file to allcode/pycode on remote
-      sftp.get(parmsftpfromfile,parmtolocalfile) # get a remote file to local file   
+   # Make sure local output file does not exist
+   if os.path.isfile(parmtolocalfile):
+      if parmreplace: # If replace, delete existing file
+         os.remove(parmtolocalfile)
+      else: # Bail out if found and replace not selected
+         raise Exception('Local file ' + parmtolocalfile + ' exists and replace not selected. Process cancelled.')          
+     
+   print("Downloading file " + parmsftpfromfile + " to " + parmtolocalfile)
+   sftp.get(parmsftpfromfile,parmtolocalfile) # get a remote file to local file   
 
    # Set success info
    exitcode=0
