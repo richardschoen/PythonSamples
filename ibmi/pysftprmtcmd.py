@@ -3,21 +3,22 @@
 # Script name: pysftprmtcmd.py
 #
 # Description: 
-# This script will run up to 5 individual QSH/PASE remote commands.
+# This script will run up to 5 individual remote QSH/PASE or other SSH commands over SFTP SSH channel.
 # The commands are run separately.
 # If you want commands run together, create a .bat file, PowerShell script or shell script to run on the remote system.
-#
-# TODO Items:  
-# This version utilizes user ID and password, not a private key.
+# This version utilizes user ID and password or a user and private key file.
 #
 # Pip packages needed:
 # pip3 install pysftp
+# pip3 install pysftp-extension
 #
 # Parameters
 # --sftphost/-host=SFTP Host
 # --sftpport/-port=SFTP Port
-# --sftpuser/-user=SFTP User
-# --sftppass/-pass=SFTP Pass
+# --sftpuser/-user=SFTP User (User name is always required)
+# --sftppass/-pass=SFTP Pass (Pasword can be empty if using private key)
+# --privatekeyfile/-privatekey=SFTP SSH private key file
+# --privatekeypass/-privatepass=SFTP SSH private key password if there is one
 # --command/-cmd=Remote command 1
 # --command2/-cmd2=Remote command 2
 # --command3/-cmd3=Remote command 3
@@ -76,6 +77,8 @@ try: # Try to perform main logic
    parser.add_argument('-port','--sftpport', required=True,help="SFTP port")
    parser.add_argument('-user','--sftpuser', required=True,help="SFTP user")
    parser.add_argument('-pass','--sftppass', required=True,help="SFTP password")
+   parser.add_argument('-privatekey','--privatekeyfile', required=True,help="Private key file")
+   parser.add_argument('-privatepass','--privatekeypass', required=True,help="Private key password")
    parser.add_argument('-cmd','--command', required=True,help="Command")
    parser.add_argument('-cmd2','--command2',default="", required=False,help="Command 2")
    parser.add_argument('-cmd3','--command3',default="", required=False,help="Command 3")
@@ -95,6 +98,8 @@ try: # Try to perform main logic
    parmcommand3=args.command3.strip()
    parmcommand4=args.command4.strip()
    parmcommand5=args.command5.strip()
+   parmsprivatekeyfile=args.privatekeyfile.strip()
+   parmsprivatekeypass=args.privatekeypass.strip()
 
    # Output parameter variables to log file
    print("Parameters:")
@@ -106,14 +111,20 @@ try: # Try to perform main logic
    print("Command 3: " + parmcommand3)
    print("Command 4: " + parmcommand4)
    print("Command 5: " + parmcommand5)
-    
    
    # Sample SFTP options
    cnopts = pysftp.CnOpts()
    cnopts.hostkeys = None
 
-   # Connect via User and Password   
-   sftp=pysftp.Connection(parmsftphost, port=parmsftpport, username=parmsftpuser, password=parmsftppass,private_key=None,private_key_pass=None,cnopts=cnopts)
+   # Connect via User and password or User and Private Key if key file specified   
+   # https://pypi.org/project/pysftp-extension/
+   if (parmsprivatekeyfile!=""):
+      sftp=pysftp.Connection(parmsftphost, port=parmsftpport, username=parmsftpuser, private_key=parmsprivatekeyfile, private_key_pass=parmsprivatekeypass, cnopts=cnopts)
+   else:
+      sftp=pysftp.Connection(parmsftphost, port=parmsftpport, username=parmsftpuser, password=parmsftppass,private_key=None,private_key_pass=None,cnopts=cnopts)
+   
+      ##sftp.server_extensions={'server-sig-algs','ssh-rsa'}
+      ###with sftp.cd('/tmp'):           #Ex: temporarily chdir to selected dir if needed
 
    # Run command 1
    if parmcommand.strip() != "":   
