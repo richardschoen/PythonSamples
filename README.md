@@ -17,5 +17,5 @@ This repository will be used for miscellaneous Python samples for all platforms 
     * `pypgmcall001.py` - Call CL program via iToolkit and XMLSERVICE.
     * `pydbtoexcel.py` - Run SQL to extract IBM i DB2 data to an Excel file
     * `pyodbcconnectiontest.py` - IBM i ODBC connection tester. Use to test native ODBC connection.
-    * `pysftpdownload.py` - Sample SFTP file download using pysftp.
-    * `pysftpupload.py` - Sample SFTP file upload using pysftp.
+    * `pysftpdownload.py` - Sample SFTP file download using pysftp. Now supports user/password or user/privatekeyfile.
+    * `pysftpupload.py` - Sample SFTP file upload using pysftp. Now supports user/password or user/privatekeyfile.
