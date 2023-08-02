@@ -20,7 +20,7 @@
 # --privatekeypass/-privatepass=SFTP SSH private key password if there is one
 # --fromlocalfile/-fromfile=Local file to upload
 # --toremotefile/-tofile=Remote file to upload to
-# --replacefile/-replace=Remote remote to file if it exists. True/False Default=False
+# --replacefile/-replace=Replace remote to file if it exists. True/False Default=False
 #------------------------------------------------
 # Useful Python links
 # https://stackoverflow.com/questions/53864260/no-hostkey-for-host-found-when-connecting-to-sftp-server-with-pysftp-usi
