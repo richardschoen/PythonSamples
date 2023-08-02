@@ -10,7 +10,7 @@
 #
 # Pip packages needed:
 # pip3 install pysftp
-# pip3 install pysftp-extension
+# pip3 install pysftp-extension (may not be needed)
 #
 # Parameters
 # --sftphost/-host=SFTP Host
