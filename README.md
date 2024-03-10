@@ -3,7 +3,8 @@ Python Samples
 
 This repository will be used for miscellaneous Python samples for all platforms including"
 ***Windows, Linux, Mac and IBM i/AS400**
-
+* Main
+    * `cmdlineparmsample1.py` - This is a template command line CLI script that utilizes argparse to parse command line arguments and then do some work. The main line logic is wrapped by try/catch for clean error handling and exit on error.
 
 * General
     * `hello.py` - Tiny hello world example
